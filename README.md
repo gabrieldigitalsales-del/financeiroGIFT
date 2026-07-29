@@ -60,3 +60,9 @@ Após o primeiro login, se o banco estiver vazio, o sistema importa automaticame
 
 ## Correção do erro Invalid schema
 Esta edição não usa schema personalizado. O Supabase é acessado pelo schema `public`, e o banco da GIFT fica isolado pelo nome exclusivo da tabela `gift_financeiro_app_state`. Assim não é necessário configurar “Exposed schemas”.
+
+## Leitura de boleto por imagem
+Na tela **Boletos**, clique em **Novo Boleto** e depois em **Selecionar imagem**. Em celulares, o seletor pode abrir a câmera. O sistema tenta primeiro a leitura nativa do código de barras e, quando necessário, usa OCR local com Tesseract.js. Código, valor e vencimento devem ser conferidos antes de salvar.
+
+## Tipografia
+Todo o sistema usa a pilha nativa `system-ui`, com Segoe UI no Windows, San Francisco em dispositivos Apple e Roboto/Arial como fallback. Nenhuma fonte externa é carregada.
