@@ -6,7 +6,6 @@ export const supabaseConfigured = Boolean(url && key);
 
 export const supabase = supabaseConfigured
   ? createClient(url, key, {
-      db: { schema: 'gift_financeiro' },
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     })
   : null;
@@ -15,7 +14,7 @@ const ROW_ID = 'matriz-principal';
 
 export async function loadAppState() {
   const { data, error } = await supabase
-    .from('app_state')
+    .from('gift_financeiro_app_state')
     .select('payload, updated_at')
     .eq('id', ROW_ID)
     .maybeSingle();
@@ -24,7 +23,7 @@ export async function loadAppState() {
 }
 
 export async function seedAppState(payload) {
-  const { error } = await supabase.from('app_state').insert({ id: ROW_ID, payload });
+  const { error } = await supabase.from('gift_financeiro_app_state').insert({ id: ROW_ID, payload });
   if (error && error.code !== '23505') throw error;
   if (error?.code === '23505') return loadAppState();
   return payload;
@@ -32,7 +31,7 @@ export async function seedAppState(payload) {
 
 export async function saveAppState(payload) {
   const { error } = await supabase
-    .from('app_state')
+    .from('gift_financeiro_app_state')
     .upsert({ id: ROW_ID, payload, updated_at: new Date().toISOString() }, { onConflict: 'id' });
   if (error) throw error;
 }

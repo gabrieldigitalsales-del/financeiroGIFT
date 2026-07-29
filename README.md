@@ -4,14 +4,14 @@ Sistema financeiro da GIFT Excellence com layout fiel à matriz Base44, banco ce
 
 ## Estrutura do banco
 
-O projeto usa o schema exclusivo `gift_financeiro` e a tabela `app_state`. Dessa forma, os dados deste sistema não se misturam com tabelas de outros projetos no mesmo Supabase.
+O projeto usa o tabela exclusiva `public_app_state` no schema `public` e a tabela `app_state`. Dessa forma, os dados deste sistema não se misturam com tabelas de outros projetos no mesmo Supabase.
 
 ## 1. Criar/configurar o Supabase
 
 1. Crie um projeto Supabase exclusivo para a GIFT (recomendado).
 2. Abra **SQL Editor**.
 3. Execute todo o conteúdo de `supabase/schema.sql`.
-4. Em **API Settings → Exposed schemas**, adicione `gift_financeiro`.
+4. Em **API Settings → Exposed schemas**, adicione `public`.
 5. Em **Authentication → Users**, crie o primeiro usuário com e-mail e senha.
 
 O banco usa RLS e só permite leitura/escrita a usuários autenticados.
@@ -51,8 +51,12 @@ Após o primeiro login, se o banco estiver vazio, o sistema importa automaticame
 
 ## Segurança
 
-- Schema exclusivo: `gift_financeiro`
+- Schema exclusivo: `public`
 - Acesso anônimo bloqueado
 - RLS habilitado
 - Apenas usuários autenticados podem consultar ou alterar dados
 - Chave secreta/service role não é usada no frontend
+
+
+## Correção do erro Invalid schema
+Esta edição não usa schema personalizado. O Supabase é acessado pelo schema `public`, e o banco da GIFT fica isolado pelo nome exclusivo da tabela `gift_financeiro_app_state`. Assim não é necessário configurar “Exposed schemas”.
