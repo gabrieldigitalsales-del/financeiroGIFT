@@ -1,0 +1,20 @@
+AUDITORIA DO MÓDULO DE PROJEÇÕES — GIFT EXCELLENCE
+
+Correções aplicadas:
+1. Contas futuras cadastradas são somadas pelo valor exato e pela data de vencimento.
+2. Lançamentos cancelados não entram nos cálculos.
+3. A média histórica usa somente valores efetivamente pagos/recebidos.
+4. Meses sem movimento entram como zero na média, evitando valores inflados.
+5. A margem de segurança é aplicada somente às despesas, nunca às receitas.
+6. Naturezas são comparadas sem diferenças de espaços extras e maiúsculas/minúsculas.
+7. Receitas e despesas são conferidas pelo tipo real do lançamento.
+8. Previsões manuais permanecem salvas ao recalcular.
+9. Projeções antigas geradas pela versão anterior são descartadas na migração; lançamentos, naturezas, orçamentos e previsões manuais são preservados.
+10. A tela apresenta auditoria separando histórico realizado, futuro cadastrado, vencimentos exatos e estimativas.
+
+Conferência da base original (mês-base julho/2026):
+- 1.134 lançamentos importados.
+- Histórico pago/recebido de janeiro a julho: R$ 3.666.884,24.
+- Contas futuras cadastradas de agosto a dezembro: R$ 36.726,07.
+
+Observação: os totais projetados dependem do mês-base, quantidade de meses da média, margem de segurança, saldo inicial e previsões manuais informadas pelo usuário.
