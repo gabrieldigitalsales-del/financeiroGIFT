@@ -1,19 +1,58 @@
-# GIFT Financeiro Premium — React + Vite
+# GIFT Financeiro — React/Vite + Supabase + Vercel
 
-Sistema reconstruído a partir da matriz Base44, respeitando as tabelas, status, mês/ano de referência e regras documentadas.
+Sistema financeiro da GIFT Excellence com layout fiel à matriz Base44, banco centralizado e isolado em um schema próprio do Supabase.
 
-## Executar no Windows
-1. Extraia a pasta.
-2. Execute `start.bat`.
-3. Aguarde abrir no navegador.
+## Estrutura do banco
 
-## Regras importantes
-- DRE, Fluxo, Margem e análises usam `mes_referencia` / `ano_referencia`.
-- Realizados: status `pago` ou `recebido`.
-- Pendentes não entram no realizado.
-- Cancelados só aparecem no Ciclo Financeiro.
-- Boletos criam um lançamento vinculado e não são somados em duplicidade.
-- Projeções ficam separadas dos relatórios oficiais.
-- Exportações de Análise de Custos e Análise de Despesas foram alinhadas às respectivas telas.
+O projeto usa o schema exclusivo `gift_financeiro` e a tabela `app_state`. Dessa forma, os dados deste sistema não se misturam com tabelas de outros projetos no mesmo Supabase.
 
-Os dados são salvos localmente no navegador. Use “Restaurar base” para voltar aos dados iniciais.
+## 1. Criar/configurar o Supabase
+
+1. Crie um projeto Supabase exclusivo para a GIFT (recomendado).
+2. Abra **SQL Editor**.
+3. Execute todo o conteúdo de `supabase/schema.sql`.
+4. Em **API Settings → Exposed schemas**, adicione `gift_financeiro`.
+5. Em **Authentication → Users**, crie o primeiro usuário com e-mail e senha.
+
+O banco usa RLS e só permite leitura/escrita a usuários autenticados.
+
+## 2. Variáveis locais
+
+Copie `.env.example` para `.env.local` e preencha:
+
+```env
+VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sua_chave_publicavel
+```
+
+Nunca coloque a `service_role` no navegador ou na Vercel.
+
+## 3. Rodar no computador
+
+```bash
+npm install
+npm run dev
+```
+
+Ou execute `start.bat` no Windows.
+
+## 4. Publicar na Vercel
+
+- Framework: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+
+Na Vercel, adicione as mesmas duas variáveis em **Settings → Environment Variables**.
+
+## Primeira inicialização
+
+Após o primeiro login, se o banco estiver vazio, o sistema importa automaticamente `public/data/initialData.json` e grava a matriz no Supabase. Depois disso, todos os dispositivos autenticados usam a mesma base.
+
+## Segurança
+
+- Schema exclusivo: `gift_financeiro`
+- Acesso anônimo bloqueado
+- RLS habilitado
+- Apenas usuários autenticados podem consultar ou alterar dados
+- Chave secreta/service role não é usada no frontend

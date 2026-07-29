@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import * as XLSX from 'xlsx';
 import {
@@ -6,12 +6,14 @@ import {
   ArrowDownCircle,BarChart3,PieChart,ReceiptText,DollarSign,Download,Plus,Pencil,
   Trash2,Save,X,Search,Upload,Menu,CheckCircle2,Clock3,WalletCards,ChevronLeft,
   AlertTriangle,Eye,FileSpreadsheet,RotateCcw,Filter
+  ,LogOut,Cloud,CloudOff,ShieldCheck,LoaderCircle,Mail,LockKeyhole
 } from 'lucide-react';
 import {
   ResponsiveContainer,BarChart,Bar,XAxis,YAxis,Tooltip,Legend,CartesianGrid,
   LineChart,Line,AreaChart,Area,PieChart as RPieChart,Pie,Cell,ComposedChart
 } from 'recharts';
 import './styles.css';
+import {supabase, supabaseConfigured, loadAppState, saveAppState, seedAppState} from './supabase.js';
 
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const SHORT_MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -87,12 +89,22 @@ function Badge({children,tone='gray'}){return <span className={`badge ${tone}`}>
 function StatusBadge({status}){const s=statusNorm(status);return <Badge tone={s==='pago'||s==='recebido'?'ok':s==='cancelado'?'gray':'warn'}>{s}</Badge>}
 function ConfirmDelete({title,onConfirm,onClose}){return <Modal title={title} onClose={onClose}><div className="confirmBox"><AlertTriangle/><p>Esta ação não poderá ser desfeita.</p><div className="modalActions"><button className="secondary" onClick={onClose}>Cancelar</button><button className="dangerBtn" onClick={onConfirm}><Trash2/>Excluir</button></div></div></Modal>}
 
+function LoginScreen({onSession}){
+ const[email,setEmail]=useState(''); const[password,setPassword]=useState(''); const[busy,setBusy]=useState(false); const[error,setError]=useState('');
+ const submit=async e=>{e.preventDefault();setBusy(true);setError('');const{data,error}=await supabase.auth.signInWithPassword({email,password});setBusy(false);if(error){setError('E-mail ou senha inválidos. Confira o usuário criado no Supabase.');return}onSession(data.session)};
+ if(!supabaseConfigured)return <div className="authShell"><div className="authCard setupCard"><img src="/assets/logo-gift.jpg" alt="GIFT Excellence"/><CloudOff/><h1>Supabase ainda não configurado</h1><p>Adicione as variáveis <b>VITE_SUPABASE_URL</b> e <b>VITE_SUPABASE_PUBLISHABLE_KEY</b> na Vercel ou no arquivo <code>.env.local</code>.</p><div className="setupSteps"><span>1</span><p>Execute o arquivo <b>supabase/schema.sql</b> no SQL Editor.</p><span>2</span><p>Crie o primeiro usuário em Authentication → Users.</p><span>3</span><p>Configure as variáveis e publique novamente.</p></div></div></div>;
+ return <div className="authShell"><form className="authCard" onSubmit={submit}><img src="/assets/logo-gift.jpg" alt="GIFT Excellence"/><div className="authIcon"><ShieldCheck/></div><h1>Financeiro GIFT</h1><p>Acesso seguro ao banco exclusivo da empresa.</p><label><span>E-mail</span><div><Mail/><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com"/></div></label><label><span>Senha</span><div><LockKeyhole/><input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/></div></label>{error&&<div className="authError">{error}</div>}<button disabled={busy}>{busy?<><LoaderCircle className="spin"/>Entrando...</>:<>Entrar no sistema</>}</button><small>Os dados ficam centralizados no Supabase e são compartilhados entre dispositivos autorizados.</small></form></div>
+}
+
 function App(){
  const[db,setDb]=useState(migrate({})); const[ready,setReady]=useState(false); const[tab,setTab]=useState('Orçamento');
  const[month,setMonth]=useState(6); const[year,setYear]=useState(2026); const[mobile,setMobile]=useState(false); const[search,setSearch]=useState('');
+ const[session,setSession]=useState(null); const[authReady,setAuthReady]=useState(false); const[syncState,setSyncState]=useState('idle'); const[loadError,setLoadError]=useState('');
  const[txModal,setTxModal]=useState(null); const[natModal,setNatModal]=useState(null); const[budgetEdit,setBudgetEdit]=useState(null); const[boletoModal,setBoletoModal]=useState(null); const[projectionModal,setProjectionModal]=useState(null); const[deleteState,setDeleteState]=useState(null);
- useEffect(()=>{const saved=localStorage.getItem('gift-financeiro-base44-v2'); if(saved){setDb(migrate(JSON.parse(saved)));setReady(true)}else fetch('/data/initialData.json').then(r=>r.json()).then(d=>{setDb(migrate(d));setReady(true)}).catch(()=>setReady(true))},[]);
- useEffect(()=>{if(ready)localStorage.setItem('gift-financeiro-base44-v2',JSON.stringify(db))},[db,ready]);
+ const hydrated=useRef(false); const saveTimer=useRef(null);
+ useEffect(()=>{if(!supabaseConfigured){setAuthReady(true);return}supabase.auth.getSession().then(({data})=>{setSession(data.session);setAuthReady(true)});const{data:{subscription}}=supabase.auth.onAuthStateChange((_event,next)=>{setSession(next);setAuthReady(true)});return()=>subscription.unsubscribe()},[]);
+ useEffect(()=>{if(!authReady||!session)return;(async()=>{setReady(false);setLoadError('');try{let remote=await loadAppState();if(!remote){const initial=await fetch('/data/initialData.json').then(r=>r.json());remote=migrate(initial);await seedAppState(remote)}setDb(migrate(remote));hydrated.current=true;setReady(true)}catch(e){console.error(e);setLoadError(e.message||'Não foi possível carregar o banco.');setReady(true)}})()},[authReady,session?.user?.id]);
+ useEffect(()=>{if(!ready||!session||!hydrated.current)return;clearTimeout(saveTimer.current);setSyncState('saving');saveTimer.current=setTimeout(async()=>{try{await saveAppState(db);setSyncState('saved')}catch(e){console.error(e);setSyncState('error')}},650);return()=>clearTimeout(saveTimer.current)},[db,ready,session]);
  const period=useMemo(()=>db.transactions.filter(l=>refMonth(l)===month&&refYear(l)===year),[db.transactions,month,year]);
  const annual=useMemo(()=>db.transactions.filter(l=>refYear(l)===year),[db.transactions,year]);
  const realizedPeriod=useMemo(()=>period.filter(isSettled),[period]); const realizedAnnual=useMemo(()=>annual.filter(isSettled),[annual]);
@@ -105,9 +117,12 @@ function App(){
  const saveBudget=(natureId,value)=>setDb(d=>{const exists=d.budgets.find(b=>String(b.natureza_id||b.natureId)===String(natureId)&&num(b.mes)===month+1&&num(b.ano)===year);const n=d.natures.find(x=>String(x.id)===String(natureId));const rec={id:exists?.id||uid(),natureza_id:natureId,natureza_nome:n?.nome||'',mes:month+1,ano:year,valor_previsto:num(value),valor_realizado:0};return{...d,budgets:exists?d.budgets.map(b=>String(b.id)===String(exists.id)?rec:b):[...d.budgets,rec]}});
  const saveBoleto=f=>{setDb(d=>{const n=d.natures.find(x=>String(x.id)===String(f.natureza_id));let txId=f.lancamento_id||uid();const tx={id:txId,descricao:f.descricao||f.fornecedor,natureza_id:f.natureza_id,natureza_nome:n?.nome||'',tipo:'saida',valor:num(f.valor),data:f.data_vencimento,data_vencimento:f.data_vencimento,status:f.status==='pago'?'pago':'pendente',observacao:'Boleto vinculado',mes_referencia:num(String(f.data_vencimento).slice(5,7)),ano_referencia:num(String(f.data_vencimento).slice(0,4))};const b={...f,id:f.id||uid(),lancamento_id:txId,natureza_nome:n?.nome||'',valor:num(f.valor),competencia_mes:num(f.competencia_mes),competencia_ano:num(f.competencia_ano)};return{...d,boletos:f.id?d.boletos.map(x=>String(x.id)===String(f.id)?b:x):[b,...d.boletos],transactions:d.transactions.some(x=>String(x.id)===String(txId))?d.transactions.map(x=>String(x.id)===String(txId)?tx:x):[tx,...d.transactions]}});setBoletoModal(null)};
  const saveProjection=f=>{const rec={...f,id:f.id||uid(),valor:num(f.valor),mes:num(f.mes),ano:num(f.ano),source:f.source||'Manual'};setDb(d=>({...d,projections:f.id?d.projections.map(x=>String(x.id)===String(f.id)?rec:x):[...d.projections,rec]}));setProjectionModal(null)};
- const resetData=()=>{if(confirm('Restaurar os dados originais? As alterações locais serão apagadas.')){localStorage.removeItem('gift-financeiro-base44-v1');location.reload()}};
- if(!ready)return <div className="loading">Carregando sistema financeiro...</div>;
- return <div className="app"><header className="realTopbar"><div className="logoBox"><img src="/assets/logo-gift.jpg" alt="GIFT Excellence"/></div><div className="navScroller"><nav className="realNav">{NAV_GROUPS.flatMap(g=>g.items).map(([name,Icon])=><button key={name} className={tab===name?'active':''} onClick={()=>setTab(name)}><Icon/>{name}</button>)}</nav></div><button className="resetTop" title="Restaurar base original" onClick={resetData}><RotateCcw/></button></header><main className="realMain"><div className="content"><Page tab={tab} db={db} setDb={setDb} month={month} setMonth={setMonth} year={year} setYear={setYear} period={period} annual={annual} realizedPeriod={realizedPeriod} realizedAnnual={realizedAnnual} income={income} expense={expense} groupNature={groupNature} search={search} setSearch={setSearch} setTxModal={setTxModal} setNatModal={setNatModal} setBudgetEdit={setBudgetEdit} setBoletoModal={setBoletoModal} setProjectionModal={setProjectionModal} setDeleteState={setDeleteState} saveBudget={saveBudget}/></div></main>
+ const resetData=async()=>{if(confirm('Restaurar os dados originais da planilha? Esta ação substituirá o banco compartilhado.')){const initial=await fetch('/data/initialData.json').then(r=>r.json());setDb(migrate(initial))}};
+ const logout=()=>supabase?.auth.signOut();
+ if(!authReady)return <div className="loading"><LoaderCircle className="spin"/>Verificando acesso...</div>;
+ if(!session)return <LoginScreen onSession={setSession}/>;
+ if(!ready)return <div className="loading"><LoaderCircle className="spin"/>Carregando banco financeiro...</div>;
+ return <div className="app"><header className="realTopbar"><div className="logoBox"><img src="/assets/logo-gift.jpg" alt="GIFT Excellence"/></div><div className="navScroller"><nav className="realNav">{NAV_GROUPS.flatMap(g=>g.items).map(([name,Icon])=><button key={name} className={tab===name?'active':''} onClick={()=>setTab(name)}><Icon/>{name}</button>)}</nav></div><div className={`syncBadge ${syncState}`} title={syncState==='error'?'Erro ao sincronizar':syncState==='saving'?'Salvando no Supabase':'Banco sincronizado'}>{syncState==='error'?<CloudOff/>:<Cloud/>}<span>{syncState==='saving'?'Salvando':syncState==='error'?'Sem sincronizar':'Online'}</span></div><button className="resetTop" title="Restaurar base original" onClick={resetData}><RotateCcw/></button><button className="logoutTop" title="Sair" onClick={logout}><LogOut/></button></header>{loadError&&<div className="globalError">{loadError}</div>}<main className="realMain"><div className="content"><Page tab={tab} db={db} setDb={setDb} month={month} setMonth={setMonth} year={year} setYear={setYear} period={period} annual={annual} realizedPeriod={realizedPeriod} realizedAnnual={realizedAnnual} income={income} expense={expense} groupNature={groupNature} search={search} setSearch={setSearch} setTxModal={setTxModal} setNatModal={setNatModal} setBudgetEdit={setBudgetEdit} setBoletoModal={setBoletoModal} setProjectionModal={setProjectionModal} setDeleteState={setDeleteState} saveBudget={saveBudget}/></div></main>
  {txModal&&<TxModal initial={txModal} natures={db.natures} onSave={saveTx} onClose={()=>setTxModal(null)}/>} {natModal&&<NatureModal initial={natModal} onSave={saveNature} onClose={()=>setNatModal(null)}/>} {budgetEdit&&<BudgetModal initial={budgetEdit} onSave={v=>{saveBudget(budgetEdit.natureId,v);setBudgetEdit(null)}} onClose={()=>setBudgetEdit(null)}/>} {boletoModal&&<BoletoModal initial={boletoModal} natures={db.natures} onSave={saveBoleto} onClose={()=>setBoletoModal(null)}/>} {projectionModal&&<ProjectionModal initial={projectionModal} natures={db.natures} year={year} onSave={saveProjection} onClose={()=>setProjectionModal(null)}/>} {deleteState&&<ConfirmDelete title="Confirmar exclusão" onConfirm={deleteEntity} onClose={()=>setDeleteState(null)}/>} </div>
 }
 
