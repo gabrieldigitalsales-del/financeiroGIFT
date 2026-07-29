@@ -40,6 +40,24 @@ const refYear=l=>Number.isFinite(+l.ano_referencia)?+l.ano_referencia:+String(l.
 const dateBR=s=>s?String(s).split('-').reverse().join('/'):'—';
 const pct=(a,b)=>b?`${(a/b*100).toFixed(1)}%`:'0,0%';
 
+function inferFornecedor(l){
+ const d=norm(l.descricao);
+ if(d.includes('CHAPAS PRENSA'))return 'CORTAÇO';
+ if(d.includes('MATERIAIS ELÉTRICOS')||d.includes('MATERIAIS ELETRICOS'))return 'EQUIFLEX';
+ if(d.includes('VÁLVULAS PIRACICABA')||d.includes('VALVULAS PIRACICABA'))return 'PIRACICABA';
+ if((d==='VÁLVULAS'||d==='VALVULAS')&&num(l.valor)===900)return 'CONTROL STAR';
+ if(d.includes('VÁLVULAS')||d.includes('VALVULAS'))return 'PIRACICABA';
+ if(d.includes('MOTOVIBRADOR')||d.includes('MOTORES'))return 'MVL MÁQUINAS';
+ if(d.includes('UNIDADES HIDRÁULICAS LYCOS')||d.includes('UNIDADES HIDRAULICAS LYCOS'))return 'LYCOS';
+ return l.descricao||l.natureza_nome||'FORNECEDOR';
+}
+function deriveBoletos(transactions){
+ return transactions.filter(l=>typeNorm(l.tipo)==='saida'&&statusNorm(l.status)==='pendente').map((l,i)=>({
+  id:`auto-boleto-${l.id??i}`, fornecedor:inferFornecedor(l), natureza_id:l.natureza_id||'', natureza_nome:l.natureza_nome||'',
+  lancamento_id:l.id, descricao:l.descricao||'', competencia_mes:7, competencia_ano:2026,
+  data_vencimento:l.data_vencimento||l.data||'', valor:num(l.valor), status:'pendente', codigo_barras:'', arquivo_url:'', automatico:true
+ }));
+}
 function migrate(raw){
  const transactions=(raw.transactions||raw.lancamentos||[]).map((x,i)=>{
    const date=x.data||x.date||'2026-01-01';
@@ -52,7 +70,9 @@ function migrate(raw){
    };
  });
  const natures=(raw.natures||raw.naturezas||[]).map((x,i)=>({id:x.id??uid()+i,nome:x.nome??x.name??'',tipo:x.tipo??x.type??'despesa',ativo:x.ativo??x.active??true}));
- return {transactions,natures,budgets:raw.budgets||raw.orcamentos||[],boletos:raw.boletos||[],projections:raw.projections||[],projectionSettings:{lookback:3,safety:10,openingBalance:0,...raw.projectionSettings}};
+ const explicitBoletos=raw.boletos||[];
+ const boletos=explicitBoletos.length?explicitBoletos:deriveBoletos(transactions);
+ return {transactions,natures,budgets:raw.budgets||raw.orcamentos||[],boletos,projections:raw.projections||[],projectionSettings:{lookback:3,safety:10,openingBalance:0,...raw.projectionSettings}};
 }
 
 function Modal({title,onClose,children,size=''}){return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><div className={`modal ${size}`}><div className="modalHead"><h3>{title}</h3><button className="iconBtn" onClick={onClose}><X/></button></div>{children}</div></div>}
@@ -71,8 +91,8 @@ function App(){
  const[db,setDb]=useState(migrate({})); const[ready,setReady]=useState(false); const[tab,setTab]=useState('Orçamento');
  const[month,setMonth]=useState(6); const[year,setYear]=useState(2026); const[mobile,setMobile]=useState(false); const[search,setSearch]=useState('');
  const[txModal,setTxModal]=useState(null); const[natModal,setNatModal]=useState(null); const[budgetEdit,setBudgetEdit]=useState(null); const[boletoModal,setBoletoModal]=useState(null); const[projectionModal,setProjectionModal]=useState(null); const[deleteState,setDeleteState]=useState(null);
- useEffect(()=>{const saved=localStorage.getItem('gift-financeiro-base44-v1'); if(saved){setDb(migrate(JSON.parse(saved)));setReady(true)}else fetch('/data/initialData.json').then(r=>r.json()).then(d=>{setDb(migrate(d));setReady(true)}).catch(()=>setReady(true))},[]);
- useEffect(()=>{if(ready)localStorage.setItem('gift-financeiro-base44-v1',JSON.stringify(db))},[db,ready]);
+ useEffect(()=>{const saved=localStorage.getItem('gift-financeiro-base44-v2'); if(saved){setDb(migrate(JSON.parse(saved)));setReady(true)}else fetch('/data/initialData.json').then(r=>r.json()).then(d=>{setDb(migrate(d));setReady(true)}).catch(()=>setReady(true))},[]);
+ useEffect(()=>{if(ready)localStorage.setItem('gift-financeiro-base44-v2',JSON.stringify(db))},[db,ready]);
  const period=useMemo(()=>db.transactions.filter(l=>refMonth(l)===month&&refYear(l)===year),[db.transactions,month,year]);
  const annual=useMemo(()=>db.transactions.filter(l=>refYear(l)===year),[db.transactions,year]);
  const realizedPeriod=useMemo(()=>period.filter(isSettled),[period]); const realizedAnnual=useMemo(()=>annual.filter(isSettled),[annual]);
