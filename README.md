@@ -110,3 +110,8 @@ Esta versão replica a referência visual aprovada em `docs/layout-referencia-ap
 - aplicação do padrão em todas as telas.
 
 Nenhuma alteração no schema SQL é necessária para esta atualização visual.
+
+## Atualização do topo — usuário e notificações
+- O ícone de usuário agora abre um menu com nome, e-mail, status conectado e botão **Sair do sistema**.
+- A campainha agora exibe alertas calculados a partir dos dados existentes: boletos vencidos/próximos, recebimentos pendentes, pendências antigas, projeção negativa e falha de sincronização.
+- Não requer alteração no schema SQL.

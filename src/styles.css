@@ -58,7 +58,7 @@ button,input,select,textarea{font:inherit}
 .realTopbar{
   position:sticky;top:0;z-index:80;height:76px;background:#fff;
   display:flex;align-items:stretch;border-bottom:1px solid #e4e8ed;
-  box-shadow:0 3px 14px rgba(25,42,62,.055);overflow:hidden;
+  box-shadow:0 3px 14px rgba(25,42,62,.055);overflow:visible;
 }
 .logoBox{
   width:148px;min-width:148px;padding:10px 18px 9px 22px;
@@ -143,3 +143,44 @@ td b{font-weight:700;color:#0e1a2d}.moneyCell{text-align:right;font-weight:600}
 @media(max-width:1280px){.content{padding-left:28px;padding-right:28px}.realNav button{padding:0 11px}.kpis{gap:18px}.kpi strong{font-size:25px}.kpiIcon{width:66px;height:66px}}
 @media(max-width:900px){.realTopbar{height:70px}.logoBox{width:112px;min-width:112px;padding:8px 12px}.logoBox img{width:88px;height:50px}.syncDot{display:none}.topIcon,.profileTop{height:70px}.content{padding:25px 18px 44px}.pageHeader{flex-direction:column}.headerActions{width:100%}.headerActions select{flex:1;width:auto}.kpis,.kpis.four{grid-template-columns:repeat(2,minmax(0,1fr))}.tablePanel{padding:17px}.realNav button{height:40px}}
 @media(max-width:600px){.logoBox{width:96px;min-width:96px;padding:8px}.logoBox img{width:80px}.topIcon{display:none}.profileTop{width:46px}.profileTop svg:last-child{display:none}.content{padding:20px 12px 36px}.pageHeader h1{font-size:29px}.pageHeader p{font-size:13px}.headerActions{gap:8px}.headerActions select{height:42px;padding-left:12px}.kpis,.kpis.four{grid-template-columns:1fr;gap:14px}.kpi{min-height:104px;padding:17px}.kpiIcon{width:62px;height:62px}.kpi strong{font-size:24px}.tablePanel{padding:14px 10px}.tablePanel>h3{padding:0 4px}.tableFooter{align-items:flex-start;flex-direction:column;padding:13px}.pager{width:100%;overflow-x:auto;padding-bottom:2px}.pager select{min-width:140px}.realNav{padding:0 4px}.realNav button{padding:0 10px;font-size:12px}}
+
+/* ===== Refinamento tipográfico + menus funcionais do topo ===== */
+body{font-weight:400;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.realNav button{font-weight:430}
+.realNav button.active{font-weight:600}
+.pageHeader h1{font-weight:680}
+.pageHeader p{font-weight:400}
+.kpi small{font-weight:430}
+.kpi strong{font-weight:650}
+.tablePanel>h3,.card h3{font-weight:620}
+th{font-weight:540}
+td b{font-weight:570}
+.moneyCell,.positive,.negative{font-weight:580!important}
+.badge{font-weight:540}
+.primary,.secondary,.dangerBtn,.smallPrimary{font-weight:600}
+.field span{font-weight:520}
+
+.topActions{height:100%;display:flex;align-items:stretch;flex:none;position:relative;background:#fff}
+.topDropdownWrap{position:relative;display:flex;align-items:stretch;z-index:120}
+.topIcon,.profileTop{position:relative;height:76px;border:0;border-left:1px solid #e7ebef;background:#fff;color:#68788d;display:flex;align-items:center;justify-content:center;transition:.16s ease}
+.topIcon{width:50px}.profileTop{width:63px;gap:4px}
+.topIcon svg{width:17px;height:17px}.profileTop svg:first-child{width:20px;height:20px}.profileTop svg:last-child{width:13px;height:13px}
+.topIcon:hover,.profileTop:hover,.topIcon.selected,.profileTop.selected{color:#07825f;background:#f2faf7}
+.notificationCount{position:absolute;top:15px;right:10px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#e43b45;color:#fff;border:2px solid #fff;font-size:9px;font-weight:700;display:grid;place-items:center;line-height:1}
+.dropdownBackdrop{position:fixed;inset:76px 0 0;z-index:105;background:transparent;cursor:default;pointer-events:auto}
+.notificationPanel,.userDropdown{position:fixed;top:70px;z-index:140;background:#fff;border:1px solid #dfe6ec;border-radius:14px;box-shadow:0 20px 55px rgba(15,35,55,.18);overflow:hidden;animation:dropdownIn .14s ease-out;pointer-events:auto}
+.notificationPanel{right:66px;width:min(390px,calc(100vw - 24px))}.userDropdown{right:8px;width:min(320px,calc(100vw - 24px))}
+.notificationPanel:before,.userDropdown:before{display:none}
+.dropdownHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px;border-bottom:1px solid #edf1f4;position:relative;background:#fff}
+.dropdownHeader>div{display:flex;flex-direction:column;gap:3px}.dropdownHeader b{font-size:14px;font-weight:620;color:#102139}.dropdownHeader span{font-size:11px;color:#7a899a}.dropdownHeader button{border:0;background:transparent;color:#07825f;font-size:11px;font-weight:560;padding:5px;border-radius:6px}.dropdownHeader button:hover{background:#ecf8f3}
+.notificationList{max-height:390px;overflow-y:auto;padding:6px}.notificationItem{width:100%;display:grid;grid-template-columns:10px 1fr;gap:10px;text-align:left;border:0;background:#fff;padding:12px 11px;border-radius:9px;color:#17283f}.notificationItem:hover{background:#f6f9fb}.notificationItem.read{opacity:.64}.notificationItem>span:last-child{display:flex;flex-direction:column;gap:4px}.notificationItem b{font-size:12px;font-weight:580}.notificationItem small{font-size:11px;color:#718195;line-height:1.4}.notificationDot{width:8px;height:8px;border-radius:50%;margin-top:4px;background:#3b78ef}.notificationItem.warning .notificationDot{background:#eda000}.notificationItem.danger .notificationDot{background:#e43b45}.notificationItem.info .notificationDot{background:#3478e5}.notificationItem.read .notificationDot{background:#c2cbd4}
+.notificationEmpty{min-height:185px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;color:#7b8998}.notificationEmpty svg{width:33px;height:33px;color:#18a878;margin-bottom:10px}.notificationEmpty b{font-size:13px;font-weight:600;color:#31445a}.notificationEmpty span{font-size:11px;margin-top:5px}
+.userIdentity{display:flex;gap:12px;padding:18px 17px 15px;align-items:center}.userAvatar{width:43px;height:43px;border-radius:13px;background:#e7f7f1;color:#07825f;display:grid;place-items:center;flex:none}.userAvatar svg{width:22px}.userIdentity>div:last-child{min-width:0;display:flex;flex-direction:column}.userIdentity b{font-size:14px;font-weight:620;color:#102139;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.userIdentity span{font-size:11px;color:#718195;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.userIdentity em{display:flex;align-items:center;gap:6px;color:#08805e;font-size:10px;font-style:normal;margin-top:7px}.userIdentity em i{width:7px;height:7px;border-radius:50%;background:#16ad7b;box-shadow:0 0 0 3px #dbf6ec}
+.userDropdownDivider{height:1px;background:#edf1f4;margin:0 12px}.accountInfoButton,.signOutButton{width:calc(100% - 12px);margin:6px;border:0;border-radius:9px;background:#fff;display:flex;align-items:center;gap:10px;padding:11px;text-align:left;color:#53667c}.accountInfoButton:hover{background:#f6f9fb}.accountInfoButton svg,.signOutButton svg{width:18px;flex:none}.accountInfoButton span{display:flex;flex-direction:column}.accountInfoButton b{font-size:12px;font-weight:570;color:#2b3d53}.accountInfoButton small{font-size:10px;color:#7a8999;margin-top:2px}.signOutButton{color:#c9323c;font-size:12px;font-weight:570;margin-top:0;margin-bottom:8px}.signOutButton:hover{background:#fff2f3}
+@keyframes dropdownIn{from{opacity:0;transform:translateY(-5px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:900px){.topIcon,.profileTop{height:70px}.dropdownBackdrop{inset:70px 0 0}.notificationPanel{right:58px}.userDropdown{right:6px}}
+@media(max-width:600px){.topIcon{display:flex}.profileTop{width:47px}.notificationPanel{right:8px;left:8px;top:70px;width:auto}.userDropdown{right:8px;top:70px}.notificationPanel:before,.userDropdown:before{display:none}}
+
+/* Menus do topo: painéis fixos acima do backdrop e totalmente clicáveis */
+.realTopbar{z-index:110}
+.notificationPanel button,.userDropdown button{pointer-events:auto}
