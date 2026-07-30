@@ -95,3 +95,18 @@ Referência de teste:
 - Linha: `00190.62827 84776.433207 00002.062313 3 15090000350063`
 - Valor: `R$ 3.500,63`
 - Vencimento: `16/07/2026`
+
+## Layout final aprovado
+
+Esta versão replica a referência visual aprovada em `docs/layout-referencia-aprovada.png`:
+
+- logo fixa no canto superior esquerdo;
+- menu superior horizontal sem quebra de linha;
+- rolagem lateral somente na área central do menu;
+- ações do usuário fixas à direita;
+- fonte nativa System UI / Segoe UI;
+- cartões em gradiente com ícone à esquerda e textura suave;
+- tabelas, filtros, badges, progresso e paginação no mesmo padrão visual;
+- aplicação do padrão em todas as telas.
+
+Nenhuma alteração no schema SQL é necessária para esta atualização visual.
