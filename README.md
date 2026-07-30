@@ -66,3 +66,8 @@ Na tela **Boletos**, clique em **Novo Boleto** e depois em **Selecionar imagem**
 
 ## Tipografia
 Todo o sistema usa a pilha nativa `system-ui`, com Segoe UI no Windows, San Francisco em dispositivos Apple e Roboto/Arial como fallback. Nenhuma fonte externa é carregada.
+
+## Leitura de boletos
+A tela Boletos aceita linha digitável manual, imagens JPG/PNG/WEBP, câmera do celular e PDF. O sistema tenta localizar o código de barras/linha digitável, valor, vencimento e competência. A conferência manual antes de salvar continua obrigatória.
+
+Na projeção, o campo **Saldo disponível no início da projeção** corresponde ao dinheiro já disponível em caixa e contas bancárias no primeiro dia projetado. Valores ainda a receber não devem ser incluídos.
