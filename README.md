@@ -71,3 +71,27 @@ Todo o sistema usa a pilha nativa `system-ui`, com Segoe UI no Windows, San Fran
 A tela Boletos aceita linha digitável manual, imagens JPG/PNG/WEBP, câmera do celular e PDF. O sistema tenta localizar o código de barras/linha digitável, valor, vencimento e competência. A conferência manual antes de salvar continua obrigatória.
 
 Na projeção, o campo **Saldo disponível no início da projeção** corresponde ao dinheiro já disponível em caixa e contas bancárias no primeiro dia projetado. Valores ainda a receber não devem ser incluídos.
+
+## Leitura segura de boletos
+
+A importação de boletos segue esta ordem:
+
+1. PDF com texto: procura uma linha digitável de 47 ou 48 dígitos e valida os dígitos verificadores.
+2. PDF escaneado ou imagem: tenta ler o código de barras; OCR é usado apenas como alternativa.
+3. Valor e vencimento são extraídos da estrutura validada do código. O sistema não procura números aleatórios na imagem para preencher esses campos.
+4. Se o código não for validado, valor e vencimento não são preenchidos automaticamente.
+5. Código colado manualmente também é validado ao sair do campo.
+
+Teste de referência incluído na implementação:
+- Linha: `00190.62827 84776.433207 00002.062313 3 15090000350063`
+- Valor esperado: `R$ 3.500,63`
+- Vencimento esperado: `16/07/2026`
+
+## Leitura validada de boletos
+
+A leitura agora prioriza a linha digitável/código de barras validado. PDFs com texto são lidos sem OCR; em PDF escaneado ou imagem, o sistema tenta o código e só depois usa OCR. Valor e vencimento são extraídos da estrutura do código validado. Se os dígitos verificadores falharem, o sistema não preenche esses dados automaticamente.
+
+Referência de teste:
+- Linha: `00190.62827 84776.433207 00002.062313 3 15090000350063`
+- Valor: `R$ 3.500,63`
+- Vencimento: `16/07/2026`
