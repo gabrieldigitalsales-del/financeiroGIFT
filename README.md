@@ -115,3 +115,6 @@ Nenhuma alteração no schema SQL é necessária para esta atualização visual.
 - O ícone de usuário agora abre um menu com nome, e-mail, status conectado e botão **Sair do sistema**.
 - A campainha agora exibe alertas calculados a partir dos dados existentes: boletos vencidos/próximos, recebimentos pendentes, pendências antigas, projeção negativa e falha de sincronização.
 - Não requer alteração no schema SQL.
+
+## Atualização de paginação
+As tabelas de Orçamento, Naturezas, Dados, Boletos, Recebimento e Planejamento/Projeções permitem selecionar 10, 20, 50 ou 100 itens por página. A troca reinicia automaticamente na página 1 e recalcula o intervalo e o total de páginas.
