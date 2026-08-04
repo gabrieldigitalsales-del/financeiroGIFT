@@ -184,3 +184,49 @@ td b{font-weight:570}
 /* Menus do topo: painéis fixos acima do backdrop e totalmente clicáveis */
 .realTopbar{z-index:110}
 .notificationPanel button,.userDropdown button{pointer-events:auto}
+
+/* ===== Ajuste final: centralização dos conteúdos nos cards coloridos ===== */
+.kpi{
+  justify-content:flex-start;
+  align-items:center;
+  gap:22px;
+  min-height:118px;
+}
+.kpiIcon{
+  align-self:center;
+  display:grid;
+  place-items:center;
+  margin:0;
+}
+.kpiText{
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  padding:0;
+  margin:0;
+}
+.kpi small{
+  margin:0 0 7px;
+  padding:0;
+  line-height:1.2;
+}
+.kpi strong{
+  margin:0;
+  padding:0;
+  line-height:1;
+  min-height:1em;
+  display:flex;
+  align-items:center;
+  font-variant-numeric:tabular-nums lining-nums;
+}
+.kpi em{
+  margin:7px 0 0;
+  padding:0;
+  line-height:1.2;
+}
+@media(max-width:600px){
+  .kpi{min-height:108px;gap:17px}
+  .kpiText{justify-content:center}
+}
